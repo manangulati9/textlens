@@ -67,5 +67,10 @@ func (sh *DBusShellHandler) Capture() ([]*gui.QImage, error) {
 	}
 
 	image := gui.NewQImage9(path, "PNG")
-	return screengrab.SplitFullDesktopToScreens(image), nil
+	images, err := screengrab.SplitFullDesktopToScreens(image)
+	if err != nil {
+		return nil, err
+	}
+
+	return images, nil
 }

@@ -58,5 +58,10 @@ func (g *GrimHandler) Capture() ([]*gui.QImage, error) {
 	}
 
 	full_image := gui.NewQImage9(path, "PNG")
-	return screengrab.SplitFullDesktopToScreens(full_image), nil
+	images, err := screengrab.SplitFullDesktopToScreens(full_image)
+	if err != nil {
+		return nil, err
+	}
+
+	return images, nil
 }

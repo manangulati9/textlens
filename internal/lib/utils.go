@@ -1,6 +1,7 @@
 package lib
 
 import (
+	"errors"
 	"flag"
 	"fmt"
 	"os"
@@ -45,10 +46,10 @@ func (args *Args) ValidateArgs() {
 
 	switch args.Verbosity {
 	case "debug":
-	case "warning":
-	case "error":
+	case "warnings":
+	case "errors":
 	default:
-		fmt.Println("Error: Invalid value for -verbosity flag. Allowed values: 'debug' | 'warning' | 'error'")
+		fmt.Println(`Error: Invalid value for -verbosity flag. Allowed values: "debug" | "warnings" | "errors"`)
 		os.Exit(1)
 	}
 
@@ -81,4 +82,24 @@ func SetFlatpakEnvs() {
 
 // TODO:
 func SetAppImageEnvs() {
+}
+
+/*
+Wrapper function that takes an unsafe function as an argument.
+It captures any panic and returns a tuple of the result and an error.
+*/
+func RunUnsafeFunc[T any](fn func() T) (result T, err error) {
+	defer func() {
+		if r := recover(); r != nil {
+			LogError.Println("Provided function errored out; recovered")
+			err = errors.New("Function panicked")
+			var ok bool
+			result, ok = r.(T) // Attempt to assert type to T; otherwise, keep result as zero value
+			if !ok {
+				result = *new(T) // Assign zero value of T if panic value cannot be asserted
+			}
+		}
+	}()
+	result = fn()
+	return result, nil
 }
