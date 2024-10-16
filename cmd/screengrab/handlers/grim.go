@@ -30,7 +30,7 @@ func (g *GrimHandler) IsInstalled() bool {
 	cmd := exec.Command("which", "grim")
 	res, err := cmd.Output()
 	if err != nil {
-		lib.Logger.Error.Fatalln("Failed to run command 'which'")
+		lib.LogError.Fatalln("Failed to run command 'which'")
 		return false
 	}
 	return string(res) != ""
@@ -53,7 +53,7 @@ func (g *GrimHandler) Capture() ([]*gui.QImage, error) {
 	cmd := exec.Command("grim", path)
 	_, err := cmd.Output()
 	if err != nil {
-		lib.Logger.Error.Fatalln("Failed to catpure screenshot using 'grim'")
+		lib.LogError.Fatalln("Failed to catpure screenshot using 'grim'")
 		return nil, err
 	}
 

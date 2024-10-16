@@ -18,13 +18,13 @@ func (r *Rect) Height() int {
 }
 
 // Expose rect for usage with QT as {left, top, width, height}.
-func (r *Rect) Geometry() []int {
-	return []int{r.Left, r.Top, r.Width(), r.Height()}
+func (r *Rect) Geometry() [4]int {
+	return [4]int{r.Left, r.Top, r.Width(), r.Height()}
 }
 
 // Width and Height or a rect.
-func (r *Rect) Size() []int {
-	return []int{r.Width(), r.Height()}
+func (r *Rect) Size() [2]int {
+	return [2]int{r.Width(), r.Height()}
 }
 
 // Create an integer-scaled copy of the Rect.

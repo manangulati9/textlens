@@ -12,16 +12,16 @@ Also resizes screens according to image:virtual-geometry ratio.
 */
 func SplitFullDesktopToScreens(full_image *gui.QImage) []*gui.QImage {
 	if full_image == nil {
-		lib.Logger.Error.Fatalln("Invalid image ptr provided. Exiting...")
+		lib.LogError.Fatalln("Invalid image ptr provided. Exiting...")
 		return nil
 	}
 
 	virtual_geometry := gui.QGuiApplication_PrimaryScreen().VirtualGeometry()
 	ratio := full_image.Rect().Width() / virtual_geometry.Width()
 
-	lib.Logger.Info.Printf("Virtual geometry width: %d", virtual_geometry.Width())
-	lib.Logger.Info.Printf("Image width: %d", full_image.Rect().Width())
-	lib.Logger.Info.Printf("Resize ratio: %d", ratio)
+	lib.LogInfo.Printf("Virtual geometry width: %d", virtual_geometry.Width())
+	lib.LogInfo.Printf("Image width: %d", full_image.Rect().Width())
+	lib.LogInfo.Printf("Resize ratio: %d", ratio)
 
 	images := []*gui.QImage{full_image}
 	// TODO: Implement support for multimonitors by capturing on all screens. QGuiApplication_Screens() throws for some reason

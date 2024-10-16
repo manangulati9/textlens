@@ -2,44 +2,53 @@ package cmd
 
 import (
 	"os"
-	"textlens/cmd/screengrab/handlers"
+	"textlens/cmd/gui"
 	"textlens/internal/lib"
 
-	"github.com/therecipe/qt/gui"
 	"github.com/therecipe/qt/widgets"
 )
 
-func Prepare() (app *widgets.QApplication, tray *widgets.QSystemTrayIcon) {
-	lib.NewLogger()
-	lib.Logger.Info.Println("Logging initialized")
-	lib.Logger.Info.Println("Preparing app...")
+/*
+Parse command line arguments.
+Exit if Textlens was started with --version flag.
+Auto-enable tray for "background mode", which starts Textlens in tray without
+immediately opening the select-region window.
+*/
+func GetArgs() *lib.Args {
+	args := lib.ParseArgs()
+	args.ValidateArgs()
+	return args
+}
 
+func Prepare() (*widgets.QApplication, *widgets.QSystemTrayIcon) {
+	args := GetArgs()
+
+	PrepareLogging(args.Verbosity)
 	PrepareEnvs()
 
-	app = widgets.NewQApplication(len(os.Args), os.Args)
+	app := widgets.NewQApplication(len(os.Args), os.Args)
 	app.SetQuitOnLastWindowClosed(false)
 
-	tray = widgets.NewQSystemTrayIcon2(gui.NewQIcon5("resources/icons/tray.svg"), app)
-	_, err := handlers.NewGrimHandler().Capture()
-	if err != nil {
-		lib.Logger.Error.Fatalln("Grim capture errored")
-	}
+	tray := gui.NewSystemTray(app, args)
 	return app, tray
 }
 
 /*
 Prepare environment variables depending on setup and system.
-Enable exiting via CTRL+C in Terminal.
 */
 func PrepareEnvs() {
-	// Allow closing QT app with CTRL+C in terminal
-	// signal.signal(signal.SIGINT, signal.SIG_DFL)
-
-	if lib.IsWaylandDisplayManager() {
+	switch {
+	case lib.IsWaylandDisplayManager():
 		lib.SetWaylandEnvs()
+	case lib.IsFlatpakPackage():
+		lib.SetFlatpakEnvs()
+	case lib.IsAppImagePackage():
+		lib.SetAppImageEnvs()
 	}
-	// if system_info.is_flatpak_package():
-	//     utils.set_environ_for_flatpak()
-	// if system_info.is_appimage_package():
-	//     utils.set_environ_for_appimage()
+}
+
+func PrepareLogging(log_level string) {
+	lib.NewLogger(log_level)
+	lib.LogInfo.Printf("Start Textlens v%s\n", lib.Version)
+	lib.LogInfo.Println("Preparing app...")
 }

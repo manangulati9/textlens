@@ -39,14 +39,14 @@ func (sh *DBusShellHandler) Capture() ([]*gui.QImage, error) {
 
 	bus := dbus.QDBusConnection_SessionBus().SessionBus()
 	if !bus.IsConnected() {
-		lib.Logger.Error.Fatalln("Not connected to dbus!")
+		lib.LogError.Fatalln("Not connected to dbus!")
 	}
 
 	// Creating a new screenshot interface
 	screenshot_interface := dbus.NewQDBusInterface2(ITEM, PATH, INTERFACE, nil, nil)
 	if !screenshot_interface.IsValid() {
 		msg := "Invalid dbus_interface"
-		lib.Logger.Error.Println(msg)
+		lib.LogError.Println(msg)
 		return nil, errors.New(msg)
 	}
 
@@ -62,7 +62,7 @@ func (sh *DBusShellHandler) Capture() ([]*gui.QImage, error) {
 	result := screenshot_interface.Call("Screenshot", core.NewQVariant9(true), core.NewQVariant9(false), core.NewQVariant12(path), nil, nil, nil, nil, nil)
 
 	if result.ErrorName() != "" {
-		lib.Logger.Error.Println("Failed to capture screenshot using dbus_shell")
+		lib.LogError.Println("Failed to capture screenshot using dbus_shell")
 		return nil, errors.New(result.ErrorMessage())
 	}
 
